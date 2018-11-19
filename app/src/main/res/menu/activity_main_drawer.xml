@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+
+
+    <item android:title="Questions">
+        <menu>
+            <item
+                android:id="@+id/nav_list"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="liste" />
+            <item
+                android:id="@+id/nav_add"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Ajouter" />
+            <item
+                android:id="@+id/nav_delete"
+                android:icon="@drawable/ic_menu_slideshow"
+                android:title="Supprimer" />
+        </menu>
+    </item>
+
+</menu>
