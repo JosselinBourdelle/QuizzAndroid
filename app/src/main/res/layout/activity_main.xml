@@ -22,19 +22,7 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:layout_gravity="center"
-            android:id="@+id/button_start"/>
-
-
-    </LinearLayout>
 
 
 </android.support.v4.widget.DrawerLayout>

@@ -45,14 +45,12 @@ public class RightActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        final ObjectAnimator animation1 = ObjectAnimator.ofFloat(transitionContainer, "translationX", 1100f);
-        animation1.setDuration(100);
+        final ObjectAnimator animation1 = ObjectAnimator.ofFloat(transitionContainer, "translationY", 2000f);
+        animation1.setDuration(0);
 
-        final ObjectAnimator animation2 = ObjectAnimator.ofFloat(transitionContainer, "translationX", -1100f);
-        animation2.setDuration(200);
+        final ObjectAnimator animation2 = ObjectAnimator.ofFloat(transitionContainer, "translationY", 0f);
+        animation2.setDuration(750);
 
-        final ObjectAnimator animation3 = ObjectAnimator.ofFloat(transitionContainer, "translationX", 0f);
-        animation3.setDuration(100);
 
         animation1.start();
 
@@ -68,18 +66,11 @@ public class RightActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                animation3.start();
+                finish();
             }
         });
 
-        animation3.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                animation1.start();
 
-            }
-        });
 
     }
 

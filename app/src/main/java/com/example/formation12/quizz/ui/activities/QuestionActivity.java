@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,8 +22,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     Button answer1, answer2, answer3, answer4;
     TextView textQuestion;
-    int countQuestionMoment = 0;
-    int score = 0;
+    public static int countQuestionMoment = 0;
 
 
 
@@ -32,6 +32,13 @@ public class QuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_question);
 
         initQuestion();
+
+        findViewById(R.id.button_float).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         answer1 = findViewById(R.id.answer1);
         answer2 = findViewById(R.id.answer2);
@@ -45,7 +52,7 @@ public class QuestionActivity extends AppCompatActivity {
                 Button buttonClicked = (Button)v;
                 if(buttonClicked.getText().toString().equals(questions.get(countQuestionMoment).bonneReponse)){
                     Intent intent = new Intent(QuestionActivity.this, RightActivity.class);
-                    score++;
+                    MainActivity.score++;
                     startActivity(intent);
                 }
                 else{
