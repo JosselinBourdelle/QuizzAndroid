@@ -1,4 +1,4 @@
-package com.example.formation12.quizz;
+package com.example.formation12.quizz.ui.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
+import com.example.formation12.quizz.R;
 
 public class WrongActivity extends AppCompatActivity {
 
@@ -41,24 +43,12 @@ public class WrongActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        final ObjectAnimator animation1 = ObjectAnimator.ofFloat(transitionContainer, "translationY", 2000f);
-        animation1.setDuration(0);
-
-        final ObjectAnimator animation2 = ObjectAnimator.ofFloat(transitionContainer, "translationY", 0f);
-        animation2.setDuration(750);
-
+        final ObjectAnimator animation1 = ObjectAnimator.ofFloat(transitionContainer, "translationY", 0f);
+        animation1.setDuration(1000);
 
         animation1.start();
 
         animation1.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                animation2.start();
-            }
-        });
-
-        animation2.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);

@@ -1,108 +1,131 @@
-package com.example.formation12.quizz;
+package com.example.formation12.quizz.ui.fragments;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
+
+import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.model.Question;
+import com.example.formation12.quizz.ui.activities.MainActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link AddFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link AddFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AddFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    //variables
 
-    private OnFragmentInteractionListener mListener;
+    List<CheckBox> checkBoxes = new ArrayList<>();
+    EditText textIntitule, textAnswer1, textAnswer2,textAnswer3,textAnswer4;
+    CheckBox check1, check2, check3, check4;
+
+    public OnCreateListener onCreateListener;
+
 
     public AddFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddFragment.
-     */
     // TODO: Rename and change types and number of parameters
     public static AddFragment newInstance(String param1, String param2) {
         AddFragment fragment = new AddFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+       return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_add, container, false);
+
+        textIntitule = rootView.findViewById(R.id.edittext_intitule);
+        textAnswer1 = rootView.findViewById(R.id.edittext_answer1);
+        textAnswer2 = rootView.findViewById(R.id.edittext_answer2);
+        textAnswer3 = rootView.findViewById(R.id.edittext_answer3);
+        textAnswer4 = rootView.findViewById(R.id.edittext_answer4);
+
+
+        textAnswer1.getError();
+
+        check1 = rootView.findViewById(R.id.check1);
+        check2 = rootView.findViewById(R.id.check2);
+        check3 = rootView.findViewById(R.id.check3);
+        check4 = rootView.findViewById(R.id.check4);
+        checkBoxes.add(check1);
+        checkBoxes.add(check2);
+        checkBoxes.add(check3);
+        checkBoxes.add(check4);
+        check1.setOnClickListener(onCheckListener);
+        check2.setOnClickListener(onCheckListener);
+        check3.setOnClickListener(onCheckListener);
+        check4.setOnClickListener(onCheckListener);
+
+        rootView.findViewById(R.id.floatbutton_add).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Question q = new Question(textIntitule.getText().toString(),4);
+                q.propositions = Arrays.asList( textAnswer1.getText().toString(), textAnswer2.getText().toString(),
+                                                textAnswer3.getText().toString(), textAnswer4.getText().toString());
+                q.bonneReponse = addBonneReponse();
+                onCreateListener.questionCreated(q);
+            }
+        });
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    private String addBonneReponse(){
+        if(check1.isChecked()){
+            return textAnswer1.getText().toString();
+        }else if (check2.isChecked()){
+            return textAnswer2.getText().toString();
+        }else if (check3.isChecked()){
+            return textAnswer3.getText().toString();
+        }else if (check4.isChecked()){
+            return textAnswer4.getText().toString();
+        }
+        else{
+            return "";
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    private View.OnClickListener onCheckListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            CheckBox checkV = (CheckBox)v;
+            for (CheckBox c : checkBoxes){
+                if(!c.equals(checkV)){
+                    c.setChecked(false);
+                }
+            }
+            checkV.setChecked(true);
         }
-    }
+    };
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        onCreateListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface OnCreateListener {
+        void questionCreated(Question q);// pass any parameter in your onCallBack which you want to return
     }
 }
+
+

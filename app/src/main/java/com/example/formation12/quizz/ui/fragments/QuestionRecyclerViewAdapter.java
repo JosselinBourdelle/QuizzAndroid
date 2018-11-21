@@ -1,4 +1,4 @@
-package com.example.formation12.quizz;
+package com.example.formation12.quizz.ui.fragments;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,7 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.formation12.quizz.QuestionListFragment.OnListFragmentInteractionListener;
+import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.ui.fragments.QuestionListFragment.OnListFragmentInteractionListener;
 
 import com.example.formation12.quizz.model.Question;
 

@@ -1,13 +1,9 @@
-package com.example.formation12.quizz;
+package com.example.formation12.quizz.ui.activities;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,12 +12,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+
+
+import com.example.formation12.quizz.ui.fragments.QuestionListFragment;
+import com.example.formation12.quizz.model.Question;
+import com.example.formation12.quizz.ui.fragments.AddFragment;
+import com.example.formation12.quizz.ui.fragments.PlayFragment;
+import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.ui.fragments.ScoreFragment;
+import com.example.formation12.quizz.ui.fragments.SettingsFragment;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, PlayFragment.OnFragmentInteractionListener, ScoreFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        QuestionListFragment.OnListFragmentInteractionListener,
+        AddFragment.OnCreateListener
+{
 
     public static int score = 0;
+    public static List<Question> questions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +42,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        questionsInit(questions);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -40,8 +53,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
+        if(savedInstanceState==null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
+        }
 
 
     }
@@ -72,6 +86,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Fragment frag = new SettingsFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
+
             return true;
         }
 
@@ -85,17 +103,20 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_play) {
-            Fragment frag = new PlayFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new PlayFragment()).commit();
 
         } else if (id == R.id.nav_score) {
-            Fragment frag = new ScoreFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new ScoreFragment()).commit();
 
 
         } else if (id == R.id.nav_list) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
+
 
         } else if (id == R.id.nav_add) {
+            Fragment frag = new AddFragment();
+            ((AddFragment) frag).onCreateListener = this;
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
 
         } else if (id == R.id.nav_delete) {
 
@@ -106,8 +127,44 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
-    public void onFragmentInteraction(Uri uri) {
-        //FIXME: LATER
+    public void onListFragmentInteraction(Question item) {
+        Intent intent = new Intent(this, QuestionActivity.class);
+        intent.putExtra("item",item);
+        startActivity(intent);
+    }
+
+    @Override
+    public void questionCreated(Question q) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
+        questions.add(q);
+    }
+
+    public void questionsInit(List<Question> list){
+        if(list.isEmpty()) {
+            Question question1 = new Question("Quelle est l'animal le plus grand du monde ?", 4);
+            question1.propositions = Arrays.asList(new String[]{"La baleine bleue", "La méduse à crinière de lion", "Lineus longissimus", "Godzilla"});
+            question1.bonneReponse = "La méduse à crinière de lion";
+
+            Question question2 = new Question("Quelle est le poison le plus puissant du monde ?", 4);
+            question2.propositions = Arrays.asList(new String[]{"Botox", "Cyanure", "Hydrophis-belcheri", "Sirop pour la toux"});
+            question2.bonneReponse = "Botox";
+
+            Question question3 = new Question("Les araignès sont-elles des insectes ?", 4);
+            question3.propositions = Arrays.asList(new String[]{"oui", "non", "On est pas sûr", "La réponse D"});
+            question3.bonneReponse = "non";
+
+            Question question4 = new Question("Combien de fois peut-on plier une feuille de papier au maximum ?", 4);
+            question4.propositions = Arrays.asList(new String[]{"7", "8", "15 ou 16", "au moins 8000 !"});
+            question4.bonneReponse = "15 ou 16";
+
+            list.add(question1);
+            list.add(question2);
+            list.add(question3);
+            list.add(question4);
+        }
     }
 }
+
+

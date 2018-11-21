@@ -1,4 +1,4 @@
-package com.example.formation12.quizz;
+package com.example.formation12.quizz.ui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,18 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.formation12.quizz.R;
 import com.example.formation12.quizz.model.Question;
+import com.example.formation12.quizz.ui.activities.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
+
 public class QuestionListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
@@ -30,10 +27,6 @@ public class QuestionListFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public QuestionListFragment() {
     }
 
@@ -62,7 +55,7 @@ public class QuestionListFragment extends Fragment {
 
         //TODO: list question
         List<Question> questions = new ArrayList<>();
-        questionsInit(questions);
+        questions = MainActivity.questions;
 
 
         View view = inflater.inflate(R.layout.fragment_question_list, container, false);
@@ -81,28 +74,7 @@ public class QuestionListFragment extends Fragment {
         return view;
     }
 
-    public void questionsInit(List<Question> list){
-        Question question1 = new Question("Quelle est l'animal le plus grand du monde ?", 4);
-        question1.propositions = Arrays.asList(new String[]{"La baleine bleue", "La méduse à crinière de lion", "Lineus longissimus", "Godzilla"});
-        question1.bonneReponse = "La méduse à crinière de lion";
 
-        Question question2 = new Question("Quelle est le poison le plus puissant du monde ?", 4);
-        question2.propositions = Arrays.asList(new String[]{"Botox", "Cyanure", "Hydrophis-belcheri", "Sirop pour la toux"});
-        question2.bonneReponse = "Botox";
-
-        Question question3 = new Question("Les araignès sont-elles des insectes ?", 4);
-        question3.propositions = Arrays.asList(new String[]{"oui", "non", "On est pas sûr", "La réponse D"});
-        question3.bonneReponse = "non";
-
-        Question question4 = new Question("Combien de fois peut-on plier une feuille de papier au maximum ?", 4);
-        question4.propositions = Arrays.asList(new String[]{"7", "8", "15 ou 16", "au moins 8000 !"});
-        question4.bonneReponse = "15 ou 16";
-
-        list.add(question1);
-        list.add(question2);
-        list.add(question3);
-        list.add(question4);
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -121,16 +93,6 @@ public class QuestionListFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Question item);
