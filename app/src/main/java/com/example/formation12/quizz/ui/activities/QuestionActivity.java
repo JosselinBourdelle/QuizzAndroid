@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.formation12.quizz.model.Question;
@@ -26,7 +29,7 @@ public class QuestionActivity extends AppCompatActivity {
     Button answer1, answer2, answer3, answer4;
     TextView textQuestion;
     public static int countQuestionMoment = 0;
-
+    ImageView imageRight, imageWrong;
 
 
     @Override
@@ -54,13 +57,46 @@ public class QuestionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button buttonClicked = (Button)v;
                 if(buttonClicked.getText().toString().equals(questionMoment.bonneReponse)){
-                    Intent intent = new Intent(QuestionActivity.this, RightActivity.class);
+                    //Intent intent = new Intent(QuestionActivity.this, RightActivity.class);
                     MainActivity.score++;
-                    startActivity(intent);
+                    //startActivity(intent);
+                    imageRight = findViewById(R.id.image_right);
+                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
+                    animScale.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) { }
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            imageRight.setVisibility(View.INVISIBLE);
+                            finish();
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                    imageRight.startAnimation(animScale);
+                    imageRight.setVisibility(View.VISIBLE);
                 }
                 else{
-                    Intent intent = new Intent(QuestionActivity.this, WrongActivity.class);
-                    startActivity(intent);
+                    //Intent intent = new Intent(QuestionActivity.this, WrongActivity.class);
+                    //startActivity(intent);
+
+                    imageWrong = findViewById(R.id.image_wrong);
+                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
+                    animScale.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) { }
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            imageWrong.setVisibility(View.INVISIBLE);
+                            finish();
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                    imageWrong.startAnimation(animScale);
+                    imageWrong.setVisibility(View.VISIBLE);
+
+
                 }
             }
         };

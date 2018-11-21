@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.activities.QuestionActivity">
 
+
+
+
+
+
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,6 +88,27 @@
         </LinearLayout>
     </LinearLayout>
 
+    <AbsoluteLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/valider"
+            android:id="@+id/image_right"
+            android:visibility="invisible"/>
+    </AbsoluteLayout>
+    <AbsoluteLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/cross"
+            android:id="@+id/image_wrong"
+            android:visibility="invisible"/>
+    </AbsoluteLayout>
 
 </android.support.design.widget.CoordinatorLayout>
