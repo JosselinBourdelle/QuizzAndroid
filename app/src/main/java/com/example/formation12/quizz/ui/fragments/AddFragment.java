@@ -29,6 +29,8 @@ public class AddFragment extends Fragment {
     EditText textIntitule, textAnswer1, textAnswer2,textAnswer3,textAnswer4;
     CheckBox check1, check2, check3, check4;
 
+    Question questionToEditable = null;
+
     public OnCreateListener onCreateListener;
 
 
@@ -76,6 +78,10 @@ public class AddFragment extends Fragment {
         check3.setOnClickListener(onCheckListener);
         check4.setOnClickListener(onCheckListener);
 
+        if(questionToEditable!= null){
+            setQuestionUpgrade();
+        }
+
         rootView.findViewById(R.id.floatbutton_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,6 +93,30 @@ public class AddFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    public void setQuestionToEditable(Question q){
+        questionToEditable = q;
+    }
+
+    public void setQuestionUpgrade(){
+        textIntitule.setText(questionToEditable.intitule);
+        textAnswer1.setText(questionToEditable.propositions.get(0));
+        textAnswer2.setText(questionToEditable.propositions.get(1));
+        textAnswer3.setText(questionToEditable.propositions.get(2));
+        textAnswer4.setText(questionToEditable.propositions.get(3));
+        for(CheckBox c : checkBoxes){
+            c.setChecked(false);
+        }
+        if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(0))){
+            check1.setChecked(true);
+        } else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(1))){
+            check2.setChecked(true);
+        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(2))){
+            check3.setChecked(true);
+        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(3))){
+            check4.setChecked(true);
+        }
     }
 
     private String addBonneReponse(){
@@ -116,6 +146,17 @@ public class AddFragment extends Fragment {
             checkV.setChecked(true);
         }
     };
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof AddFragment.OnCreateListener) {
+            onCreateListener = (AddFragment.OnCreateListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnListFragmentInteractionListener");
+        }
+    }
 
     @Override
     public void onDetach() {

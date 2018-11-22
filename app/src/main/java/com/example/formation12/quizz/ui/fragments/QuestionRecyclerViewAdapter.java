@@ -28,6 +28,8 @@ public class QuestionRecyclerViewAdapter extends RecyclerView.Adapter<QuestionRe
         mListener = listener;
     }
 
+
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -49,6 +51,14 @@ public class QuestionRecyclerViewAdapter extends RecyclerView.Adapter<QuestionRe
                     // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
+            }
+        });
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mListener.editQuestion(holder.mItem);
+                return true;
             }
         });
     }

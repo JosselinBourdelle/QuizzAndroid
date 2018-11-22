@@ -1,6 +1,7 @@
 package com.example.formation12.quizz.ui.activities;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
+import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.ui.fragments.QuestionListFragment;
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.ui.fragments.AddFragment;
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity
 {
 
     public static int score = 0;
-    public static List<Question> questions = new ArrayList<>();
+    //public static List<Question> questions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        questionsInit(questions);
+        questionsInit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -130,19 +132,29 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Question item) {
+
         Intent intent = new Intent(this, QuestionActivity.class);
         intent.putExtra("item",item);
         startActivity(intent);
     }
 
     @Override
-    public void questionCreated(Question q) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
-        questions.add(q);
+    public void editQuestion(Question q) {
+
+        Fragment frag = new AddFragment();
+        ((AddFragment) frag).setQuestionToEditable(q);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
     }
 
-    public void questionsInit(List<Question> list){
-        if(list.isEmpty()) {
+    @Override
+    public void questionCreated(Question q) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
+        //questions.add(q);
+        QuestionDatabaseHelper.getInstance(this).addQuestion(q);
+    }
+
+    public void questionsInit(){
+        if(QuestionDatabaseHelper.getInstance(this).getAllQuestions().isEmpty() ) {
             Question question1 = new Question("Quelle est l'animal le plus grand du monde ?", 4);
             question1.propositions = Arrays.asList(new String[]{"La baleine bleue", "La méduse à crinière de lion", "Lineus longissimus", "Godzilla"});
             question1.bonneReponse = "La méduse à crinière de lion";
@@ -159,10 +171,10 @@ public class MainActivity extends AppCompatActivity
             question4.propositions = Arrays.asList(new String[]{"7", "8", "15 ou 16", "au moins 8000 !"});
             question4.bonneReponse = "15 ou 16";
 
-            list.add(question1);
-            list.add(question2);
-            list.add(question3);
-            list.add(question4);
+            QuestionDatabaseHelper.getInstance(this).addQuestion(question1);
+            QuestionDatabaseHelper.getInstance(this).addQuestion(question2);
+            QuestionDatabaseHelper.getInstance(this).addQuestion(question3);
+            QuestionDatabaseHelper.getInstance(this).addQuestion(question4);
         }
     }
 }

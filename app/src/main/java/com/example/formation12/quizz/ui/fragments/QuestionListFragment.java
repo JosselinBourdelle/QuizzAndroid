@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.ui.activities.MainActivity;
 
@@ -49,13 +50,17 @@ public class QuestionListFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+
         //TODO: list question
         List<Question> questions = new ArrayList<>();
-        questions = MainActivity.questions;
+        questions = QuestionDatabaseHelper.getInstance(getContext()).getAllQuestions();
 
 
         View view = inflater.inflate(R.layout.fragment_question_list, container, false);
@@ -96,7 +101,6 @@ public class QuestionListFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Question item);
-
-
+        void editQuestion(Question q);
     }
 }
