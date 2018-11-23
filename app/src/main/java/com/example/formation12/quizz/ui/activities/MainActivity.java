@@ -158,18 +158,22 @@ public class MainActivity extends AppCompatActivity
             Question question1 = new Question("Quelle est l'animal le plus grand du monde ?", 4);
             question1.propositions = Arrays.asList(new String[]{"La baleine bleue", "La méduse à crinière de lion", "Lineus longissimus", "Godzilla"});
             question1.bonneReponse = "La méduse à crinière de lion";
+            question1.idquestion = Question.idCompt++;
 
             Question question2 = new Question("Quelle est le poison le plus puissant du monde ?", 4);
             question2.propositions = Arrays.asList(new String[]{"Botox", "Cyanure", "Hydrophis-belcheri", "Sirop pour la toux"});
             question2.bonneReponse = "Botox";
+            question2.idquestion = Question.idCompt++;
 
             Question question3 = new Question("Les araignès sont-elles des insectes ?", 4);
             question3.propositions = Arrays.asList(new String[]{"oui", "non", "On est pas sûr", "La réponse D"});
             question3.bonneReponse = "non";
+            question3.idquestion = Question.idCompt++;
 
             Question question4 = new Question("Combien de fois peut-on plier une feuille de papier au maximum ?", 4);
             question4.propositions = Arrays.asList(new String[]{"7", "8", "15 ou 16", "au moins 8000 !"});
             question4.bonneReponse = "15 ou 16";
+            question4.idquestion = Question.idCompt++;
 
             QuestionDatabaseHelper.getInstance(this).addQuestion(question1);
             QuestionDatabaseHelper.getInstance(this).addQuestion(question2);

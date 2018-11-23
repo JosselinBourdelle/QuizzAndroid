@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Question implements Parcelable {
+    public static int idCompt = -1;
+    public int idquestion;
     public String intitule;
     public List<String> propositions;
     public String bonneReponse;
     public int nombreMaxPropositions;
 
     public Question(String question, int nombreDeReponse) {
+
         this.intitule = question;
         propositions = new ArrayList<String>();
         nombreMaxPropositions = nombreDeReponse;

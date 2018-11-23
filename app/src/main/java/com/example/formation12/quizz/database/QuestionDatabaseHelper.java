@@ -90,6 +90,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
             if(cursor.moveToFirst()){
                 do{
                     Question newQuestion = new Question(cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_INTITULE)),4);
+                    newQuestion.idquestion = cursor.getInt(cursor.getColumnIndex(KEY_QUESTIONS_ID));
                     newQuestion.propositions = Arrays.asList(new String[]{
                             cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_ANSWER1)),
                             cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_ANSWER2)),
@@ -117,6 +118,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
         try {
 
             ContentValues values = new ContentValues();
+            values.put(KEY_QUESTIONS_ID, q.idquestion);
             values.put(KEY_QUESTIONS_INTITULE, q.intitule);
             values.put(KEY_QUESTIONS_ANSWER1, q.propositions.get(0));
             values.put(KEY_QUESTIONS_ANSWER2, q.propositions.get(1));
@@ -128,7 +130,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
                 db.insertOrThrow(TABLE_QUESTIONS,null, values);
             }
             else {
-                db.update(TABLE_QUESTIONS, values, KEY_QUESTIONS_INTITULE+ " = ?", new String[]{q.intitule});
+                db.update(TABLE_QUESTIONS, values, KEY_QUESTIONS_ID +" = ?", new String[]{q.idquestion+""});
             }
             db.setTransactionSuccessful();
 
@@ -146,7 +148,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
         String QUESTIONS_SELECT =
                         "SELECT *"+
                         " FROM " + TABLE_QUESTIONS +
-                        " WHERE "+ TABLE_QUESTIONS+"."+KEY_QUESTIONS_INTITULE + " = " + "'"+q.intitule+"'";
+                        " WHERE "+ TABLE_QUESTIONS+"."+KEY_QUESTIONS_ID + " = " +q.idquestion;
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(QUESTIONS_SELECT, null);
@@ -155,6 +157,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
             if(cursor.moveToFirst()){
                 do{
                     Question newQuestion = new Question(cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_INTITULE)),4);
+                    newQuestion.idquestion = cursor.getInt(cursor.getColumnIndex(KEY_QUESTIONS_ID));
                     newQuestion.propositions = Arrays.asList(new String[]{
                             cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_ANSWER1)),
                             cursor.getString(cursor.getColumnIndex(KEY_QUESTIONS_ANSWER2)),
