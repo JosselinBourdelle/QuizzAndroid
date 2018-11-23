@@ -1,8 +1,12 @@
 package com.example.formation12.quizz.ui.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.View;
@@ -10,17 +14,19 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.ui.Thread.ProgressTask;
 import com.example.formation12.quizz.ui.activities.RightActivity;
 import com.example.formation12.quizz.ui.activities.WrongActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionActivity extends AppCompatActivity {
+public class QuestionActivity extends AppCompatActivity implements ProgressTask.OnProgressBarListener{
 
     List<Question> questions = new ArrayList<Question>();
 
@@ -28,14 +34,15 @@ public class QuestionActivity extends AppCompatActivity {
 
     Button answer1, answer2, answer3, answer4;
     TextView textQuestion;
-    public static int countQuestionMoment = 0;
     ImageView imageRight, imageWrong;
-
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
+
+        progressBar = findViewById(R.id.progressBar);
 
         questionMoment = getIntent().getParcelableExtra("item");
 
@@ -110,6 +117,7 @@ public class QuestionActivity extends AppCompatActivity {
         setupWindowAnimations();
         animateAnswer();
 
+
     }
 
 
@@ -144,6 +152,15 @@ public class QuestionActivity extends AppCompatActivity {
 
         final ObjectAnimator animation8 = ObjectAnimator.ofFloat(answer4, "translationX", 0f);
         animation8.setDuration(3000).start();
+
+        animation8.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                ProgressTask pgt = new ProgressTask(QuestionActivity.this);
+                pgt.execute();
+            }
+        });
     }
 
     private void setupWindowAnimations() {
@@ -174,5 +191,18 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBegin() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void onProgress(Integer... values) {
+        progressBar.setProgress(values[0]);
+    }
+
+    @Override
+    public void onFinish() {
+        finish();
+    }
 }

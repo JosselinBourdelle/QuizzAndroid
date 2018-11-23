@@ -86,10 +86,14 @@ public class AddFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Question q = new Question(textIntitule.getText().toString(),4);
-                q.idquestion = Question.idCompt++;
+
+                if(questionToEditable!=null){
+                    q = questionToEditable;
+                }
                 q.propositions = Arrays.asList( textAnswer1.getText().toString(), textAnswer2.getText().toString(),
-                                                textAnswer3.getText().toString(), textAnswer4.getText().toString());
+                        textAnswer3.getText().toString(), textAnswer4.getText().toString());
                 q.bonneReponse = addBonneReponse();
+
                 onCreateListener.questionCreated(q);
             }
         });

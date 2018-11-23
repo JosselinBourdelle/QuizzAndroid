@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Question implements Parcelable {
-    public static int idCompt = -1;
     public int idquestion;
     public String intitule;
     public List<String> propositions;

@@ -11,10 +11,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
+import com.example.formation12.quizz.api.APIClient;
 import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.ui.fragments.QuestionListFragment;
 import com.example.formation12.quizz.model.Question;
@@ -24,6 +26,7 @@ import com.example.formation12.quizz.R;
 import com.example.formation12.quizz.ui.fragments.ScoreFragment;
 import com.example.formation12.quizz.ui.fragments.SettingsFragment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,8 +34,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         QuestionListFragment.OnListFragmentInteractionListener,
-        AddFragment.OnCreateListener
-{
+        AddFragment.OnCreateListener {
 
     public static int score = 0;
     //public static List<Question> questions = new ArrayList<>();
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        questionsInit();
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -55,10 +57,22 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        if(savedInstanceState==null) {
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
         }
+        APIClient.getInstance().getQuestions(new APIClient.APIResult<List<Question>>() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Debug : ", "FAIL !!!");
+            }
 
+            @Override
+            public void OnSuccess(List<Question> object)  {
+
+                QuestionDatabaseHelper.getInstance(MainActivity.this).synchroniseDatabaseQuestions(object);
+
+            }
+        });
 
     }
 
@@ -134,7 +148,7 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(Question item) {
 
         Intent intent = new Intent(this, QuestionActivity.class);
-        intent.putExtra("item",item);
+        intent.putExtra("item", item);
         startActivity(intent);
     }
 
@@ -147,40 +161,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void questionCreated(Question q) {
+    public void questionCreated(final Question q) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
-        //questions.add(q);
-        QuestionDatabaseHelper.getInstance(this).addQuestion(q);
+
+        APIClient.getInstance().createQuestion(new APIClient.APIResult<Question>() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Debug : ", "FAIL !!!");
+            }
+
+            @Override
+            public void OnSuccess(Question object) {
+                QuestionDatabaseHelper.getInstance(MainActivity.this).addQuestion(q);
+            }
+        }, q);
     }
 
-    public void questionsInit(){
-        if(QuestionDatabaseHelper.getInstance(this).getAllQuestions().isEmpty() ) {
-            Question question1 = new Question("Quelle est l'animal le plus grand du monde ?", 4);
-            question1.propositions = Arrays.asList(new String[]{"La baleine bleue", "La méduse à crinière de lion", "Lineus longissimus", "Godzilla"});
-            question1.bonneReponse = "La méduse à crinière de lion";
-            question1.idquestion = Question.idCompt++;
-
-            Question question2 = new Question("Quelle est le poison le plus puissant du monde ?", 4);
-            question2.propositions = Arrays.asList(new String[]{"Botox", "Cyanure", "Hydrophis-belcheri", "Sirop pour la toux"});
-            question2.bonneReponse = "Botox";
-            question2.idquestion = Question.idCompt++;
-
-            Question question3 = new Question("Les araignès sont-elles des insectes ?", 4);
-            question3.propositions = Arrays.asList(new String[]{"oui", "non", "On est pas sûr", "La réponse D"});
-            question3.bonneReponse = "non";
-            question3.idquestion = Question.idCompt++;
-
-            Question question4 = new Question("Combien de fois peut-on plier une feuille de papier au maximum ?", 4);
-            question4.propositions = Arrays.asList(new String[]{"7", "8", "15 ou 16", "au moins 8000 !"});
-            question4.bonneReponse = "15 ou 16";
-            question4.idquestion = Question.idCompt++;
-
-            QuestionDatabaseHelper.getInstance(this).addQuestion(question1);
-            QuestionDatabaseHelper.getInstance(this).addQuestion(question2);
-            QuestionDatabaseHelper.getInstance(this).addQuestion(question3);
-            QuestionDatabaseHelper.getInstance(this).addQuestion(question4);
-        }
-    }
 }
-
 

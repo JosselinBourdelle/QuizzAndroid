@@ -57,7 +57,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
 
         String CREATE_QUESTION_TABLE = "CREATE TABLE " + TABLE_QUESTIONS +
                 "(" +
-                    KEY_QUESTIONS_ID + " INTEGER PRIMARY KEY," +
+                    KEY_QUESTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     KEY_QUESTIONS_INTITULE + " VARCHAR(200)," +
                     KEY_QUESTIONS_ANSWER1 + " VARCHAR(200)," +
                     KEY_QUESTIONS_ANSWER2 + " VARCHAR(200)," +
@@ -118,7 +118,6 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
         try {
 
             ContentValues values = new ContentValues();
-            values.put(KEY_QUESTIONS_ID, q.idquestion);
             values.put(KEY_QUESTIONS_INTITULE, q.intitule);
             values.put(KEY_QUESTIONS_ANSWER1, q.propositions.get(0));
             values.put(KEY_QUESTIONS_ANSWER2, q.propositions.get(1));
@@ -130,13 +129,28 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
                 db.insertOrThrow(TABLE_QUESTIONS,null, values);
             }
             else {
-                db.update(TABLE_QUESTIONS, values, KEY_QUESTIONS_ID +" = ?", new String[]{q.idquestion+""});
+                db.update(TABLE_QUESTIONS, values, KEY_QUESTIONS_ID +" = ?", new String[]{String.valueOf(q.idquestion)});
             }
             db.setTransactionSuccessful();
 
         } catch (Exception e){
             Log.d("Debug DataBase", "Error while trying to add question to database");
         }   finally {
+            db.endTransaction();
+        }
+    }
+
+
+    public void deleteQuestion(Question q){
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_QUESTIONS, KEY_QUESTIONS_ID +" = ?", new String[]{String.valueOf(q.idquestion)});
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e){
+            Log.d("Debug DataBase", "Error while trying to delete question to database");
+        }finally {
             db.endTransaction();
         }
     }
@@ -179,4 +193,30 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    //TODO : Add this method to your database
+    public void synchroniseDatabaseQuestions(List<Question> serverQuestions) {
+
+        //TODO: Change getDatabase Question to have the real questions
+        List<Question> databaseQuestions = getAllQuestions();
+
+        // Here we will choose if we need to add or to update the question return by the server
+        for (Question serverQuestion : serverQuestions) {
+            addQuestion(serverQuestion);
+        }
+
+        // Now we want to delete the question if thy are not on the server anymore
+        for (Question dataBaseQuestion : databaseQuestions) {
+            boolean found = false;
+            for (Question serverQuestion : serverQuestions) {
+                if (serverQuestion.idquestion == dataBaseQuestion.idquestion) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                deleteQuestion(dataBaseQuestion);
+            }
+        }
+
+    }
 }
