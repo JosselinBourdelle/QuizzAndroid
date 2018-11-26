@@ -3,10 +3,7 @@ package com.example.formation12.quizz.ui.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.View;
@@ -17,11 +14,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.R;
 import com.example.formation12.quizz.ui.Thread.ProgressTask;
-import com.example.formation12.quizz.ui.activities.RightActivity;
-import com.example.formation12.quizz.ui.activities.WrongActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +71,8 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             imageRight.setVisibility(View.INVISIBLE);
+                            questionMoment.isGoodAnswer = 1;
+                            QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
                             finish();
                         }
                         @Override
@@ -95,6 +93,8 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             imageWrong.setVisibility(View.INVISIBLE);
+                            questionMoment.isGoodAnswer = -1;
+                            QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
                             finish();
                         }
                         @Override
@@ -102,8 +102,6 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
                     });
                     imageWrong.startAnimation(animScale);
                     imageWrong.setVisibility(View.VISIBLE);
-
-
                 }
             }
         };
@@ -116,8 +114,6 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
         setQuestion(questionMoment);
         setupWindowAnimations();
         animateAnswer();
-
-
     }
 
 
@@ -169,18 +165,6 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
         getWindow().setExitTransition(slide);
     }
 
-    private void initQuestion() {
-
-        Question question1 = new Question("Quel est la capitale de la france ?",4);
-        question1.addPropositions("Paris");
-        question1.addPropositions("Nantes");
-        question1.addPropositions("Berlin");
-        question1.addPropositions("Tokyo");
-        question1.bonneReponse = "Nantes";
-        questions.add(question1);
-    }
-
-
     private void setQuestion(Question question){
 
         textQuestion.setText(question.intitule);
@@ -189,7 +173,6 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
         answer3.setText(question.propositions.get(2));
         answer4.setText(question.propositions.get(3));
     }
-
 
     @Override
     public void onBegin() {

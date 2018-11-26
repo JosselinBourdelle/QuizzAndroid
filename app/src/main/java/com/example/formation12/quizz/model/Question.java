@@ -12,6 +12,10 @@ public class Question implements Parcelable {
     public List<String> propositions;
     public String bonneReponse;
     public int nombreMaxPropositions;
+    public String imageAuthorUrl;
+    public String authorName;
+    public int isGoodAnswer = 0;
+
 
     public Question(String question, int nombreDeReponse) {
 
@@ -25,6 +29,10 @@ public class Question implements Parcelable {
         propositions = in.createStringArrayList();
         bonneReponse = in.readString();
         nombreMaxPropositions = in.readInt();
+        idquestion = in.readInt();
+        imageAuthorUrl = in.readString();
+        authorName = in.readString();
+        isGoodAnswer = in.readInt();
     }
 
     public static final Creator<Question> CREATOR = new Creator<Question>() {
@@ -60,5 +68,9 @@ public class Question implements Parcelable {
         dest.writeStringList(propositions);
         dest.writeString(bonneReponse);
         dest.writeInt(nombreMaxPropositions);
+        dest.writeInt(idquestion);
+        dest.writeString(imageAuthorUrl);
+        dest.writeString(authorName);
+        dest.writeInt(isGoodAnswer);
     }
 }

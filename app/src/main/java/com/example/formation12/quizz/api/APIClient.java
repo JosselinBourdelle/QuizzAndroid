@@ -23,7 +23,8 @@ import okhttp3.Response;
 
 public class APIClient {
 
-    private final String baseUrl = "http://192.168.10.38:3000";
+    //private final String baseUrl = "http://192.168.10.38:3000";
+    private final String baseUrl = "http://192.168.10.171:3000";
 
     private final String KEY_ID = "id";
     private final String KEY_INTITULE = "title";
@@ -32,6 +33,11 @@ public class APIClient {
     private final String KEY_ANSWER3 = "answer_3";
     private final String KEY_ANSWER4 = "answer_4";
     private final String KEY_BONNEREPONSE = "correct_answer";
+    private final String KEY_IMAGE_AUTHOR = "author_img_url";
+    private final String KEY_AUTHOR_NAME = "author";
+
+    private final String AUTHOR_IMAGE = "https://img.ohmymag.com/article/480/humour/mr-bean-s-incruste-dans-avatar_8d73c59406e9ab1833b2cb3cb403bf93ee3dfe26.jpg";
+    private final String AUTHOR_NAME = "josselin";
 
 
     private final OkHttpClient client = new OkHttpClient();
@@ -46,7 +52,7 @@ public class APIClient {
     public void getQuestions(final APIResult<List<Question>> result) {
 
         Request request = new Request.Builder()
-                .url("http://192.168.10.38:3000/questions")
+                .url(baseUrl + "/questions")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -72,7 +78,6 @@ public class APIClient {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 result.OnSuccess(questions);
             }
         });
@@ -80,16 +85,13 @@ public class APIClient {
     }
 
     public void createQuestion(final APIResult<Question> result, Question q) {
-
-        // Prepare body for post method
         MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
         JSONObject json = new JSONObject();
         try {
             json = parseQuestionToJSON(q);
         } catch (JSONException e) {
-          //TODO LOG
+            Log.d("Debug : ", e.getMessage());
         }
-
         Request request = request = new Request.Builder()
                 .url(baseUrl+"/questions").method("POST", RequestBody.create(JSON_TYPE,json.toString()))
                 .build();
@@ -112,11 +114,35 @@ public class APIClient {
             }
         });
     }
-    //TODO : Faire un update
-    //TODO : Faire un delete
 
-    public void deleteQuestion(final APIResult<Void> result, Question q) {
+    public void deleteQuestion(final APIResult<Question> result, Question q) {
+        MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
+        JSONObject json = new JSONObject();
+        try {
+            json = parseQuestionToJSON(q);
+        } catch (JSONException e) {
+            Log.d("Debug : ", e.getMessage());
+        }
+        Request request = request = new Request.Builder()
+                .url(baseUrl+"/questions").method("DELETE", RequestBody.create(JSON_TYPE,json.toString()))
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                result.onFailure(e);
+            }
 
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                try {
+                    JSONObject jsonServerObject = new JSONObject(responseData);
+                    result.OnSuccess(parseJsonObject(jsonServerObject));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private Question parseJsonObject (JSONObject jsonObject) throws JSONException {
@@ -128,7 +154,8 @@ public class APIClient {
         question.propositions.add(jsonObject.getString(KEY_ANSWER4));
         question.bonneReponse = question.propositions.get(jsonObject.getInt(KEY_BONNEREPONSE)-1);
         question.idquestion = jsonObject.getInt(KEY_ID);
-
+        question.imageAuthorUrl = jsonObject.getString(KEY_IMAGE_AUTHOR);
+        question.authorName = jsonObject.getString(KEY_AUTHOR_NAME);
         return question;
 
     }
@@ -141,6 +168,8 @@ public class APIClient {
         json.put(KEY_ANSWER3,q.propositions.get(2));
         json.put(KEY_ANSWER4,q.propositions.get(3));
         json.put(KEY_INTITULE, q.intitule);
+        json.put(KEY_IMAGE_AUTHOR, AUTHOR_IMAGE);
+        json.put(KEY_AUTHOR_NAME, AUTHOR_NAME);
         return json;
     }
 

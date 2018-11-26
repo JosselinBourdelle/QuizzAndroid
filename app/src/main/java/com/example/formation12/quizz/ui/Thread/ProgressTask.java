@@ -1,9 +1,7 @@
 package com.example.formation12.quizz.ui.Thread;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
-import android.widget.ProgressBar;
 
 public class ProgressTask extends AsyncTask<Void, Integer, String> {
     int count = 0;

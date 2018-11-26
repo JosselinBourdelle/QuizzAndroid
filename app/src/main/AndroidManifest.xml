@@ -3,6 +3,8 @@
     package="com.example.formation12.quizz">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,14 +20,33 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+
+
+                +<action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Accepts URIs that begin with "java-lang-programming://android-app-google-plus-demo" -->
+                <data
+                    android:host="java-lang-programming"
+                    android:scheme="android-app-google-plus-demo" />
+
+
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.QuestionActivity"
             android:label="@string/title_activity_question"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.activities.WrongActivity" />
-        <activity android:name=".ui.activities.RightActivity"></activity>
+
+        <receiver android:name="com.example.formation12.quizz.receiver.NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
