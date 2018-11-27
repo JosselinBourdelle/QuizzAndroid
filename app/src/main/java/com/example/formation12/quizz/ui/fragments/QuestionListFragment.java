@@ -6,32 +6,28 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.formation12.quizz.R;
+import com.example.formation12.quizz.api.APIClient;
 import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
-import com.example.formation12.quizz.ui.activities.MainActivity;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class QuestionListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private QuestionRecyclerViewAdapter adapter;
 
     public QuestionListFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static QuestionListFragment newInstance(int columnCount) {
         QuestionListFragment fragment = new QuestionListFragment();
@@ -50,22 +46,39 @@ public class QuestionListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        APIClient.getInstance().getQuestions(new APIClient.APIResult<List<Question>>() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Debug : ", "FAIL !!!");
+            }
 
+            @Override
+            public void OnSuccess(final List<Question> object)  {
+
+                QuestionDatabaseHelper.getInstance(getActivity()).synchroniseDatabaseQuestions(object);
+                final List<Question> results = QuestionDatabaseHelper.getInstance(getActivity()).getAllQuestions();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if( adapter != null) {
+                            adapter.updateQuestionList(results);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-
-        //TODO: list question
-        List<Question> questions = new ArrayList<>();
-        questions = QuestionDatabaseHelper.getInstance(getContext()).getAllQuestions();
-
+        List<Question> questions = QuestionDatabaseHelper.getInstance(getContext()).getAllQuestions();
 
         View view = inflater.inflate(R.layout.fragment_question_list, container, false);
-
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
@@ -74,12 +87,11 @@ public class QuestionListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new QuestionRecyclerViewAdapter(questions, mListener));
+            adapter = new QuestionRecyclerViewAdapter(questions, mListener);
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }
-
-
 
     @Override
     public void onAttach(Context context) {
@@ -99,8 +111,8 @@ public class QuestionListFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Question item);
         void editQuestion(Question q);
+        void deleteQuestion(Question q);
     }
 }

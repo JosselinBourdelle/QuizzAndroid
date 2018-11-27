@@ -1,9 +1,11 @@
 package com.example.formation12.quizz.ui.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,10 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.formation12.quizz.R;
 import com.example.formation12.quizz.model.Question;
-import com.example.formation12.quizz.ui.activities.MainActivity;
+import com.example.formation12.quizz.receiver.NetworkChangeReceiver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,36 +27,21 @@ import java.util.List;
 public class AddFragment extends Fragment {
 
     //variables
+    boolean isOffline = false;
 
     List<CheckBox> checkBoxes = new ArrayList<>();
     EditText textIntitule, textAnswer1, textAnswer2,textAnswer3,textAnswer4;
     CheckBox check1, check2, check3, check4;
+    FloatingActionButton addButton;
 
     Question questionToEditable = null;
 
     public OnCreateListener onCreateListener;
 
 
-    public AddFragment() {
-        // Required empty public constructor
-    }
-
-    // TODO: Rename and change types and number of parameters
-    public static AddFragment newInstance(String param1, String param2) {
-        AddFragment fragment = new AddFragment();
-       return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add, container, false);
 
         textIntitule = rootView.findViewById(R.id.edittext_intitule);
@@ -62,6 +50,7 @@ public class AddFragment extends Fragment {
         textAnswer3 = rootView.findViewById(R.id.edittext_answer3);
         textAnswer4 = rootView.findViewById(R.id.edittext_answer4);
 
+        addButton = rootView.findViewById(R.id.floatbutton_add);
 
         textAnswer1.getError();
 
@@ -86,9 +75,14 @@ public class AddFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Question q = new Question(textIntitule.getText().toString(),4);
+
+                if(questionToEditable!=null){
+                    q = questionToEditable;
+                }
                 q.propositions = Arrays.asList( textAnswer1.getText().toString(), textAnswer2.getText().toString(),
-                                                textAnswer3.getText().toString(), textAnswer4.getText().toString());
+                        textAnswer3.getText().toString(), textAnswer4.getText().toString());
                 q.bonneReponse = addBonneReponse();
+
                 onCreateListener.questionCreated(q);
             }
         });
@@ -108,13 +102,13 @@ public class AddFragment extends Fragment {
         for(CheckBox c : checkBoxes){
             c.setChecked(false);
         }
-        if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(0))){
+        if(questionToEditable.verifierReponse(questionToEditable.propositions.get(0))){
             check1.setChecked(true);
-        } else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(1))){
+        } else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(1))){
             check2.setChecked(true);
-        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(2))){
+        }else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(2))){
             check3.setChecked(true);
-        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(3))){
+        }else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(3))){
             check4.setChecked(true);
         }
     }
@@ -165,7 +159,66 @@ public class AddFragment extends Fragment {
     }
 
     public interface OnCreateListener {
-        void questionCreated(Question q);// pass any parameter in your onCallBack which you want to return
+        void questionCreated(Question q);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        registerReceiver();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        try
+        {
+            getActivity().unregisterReceiver(internalNetworkChangeReceiver);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
+    private void registerReceiver()
+    {
+        try
+        {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(NetworkChangeReceiver.NETWORK_CHANGE_ACTION);
+            getActivity().registerReceiver(internalNetworkChangeReceiver, intentFilter);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    InternalNetworkChangeReceiver internalNetworkChangeReceiver = new InternalNetworkChangeReceiver();
+    class InternalNetworkChangeReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (addButton != null){
+                if(intent.getBooleanExtra("isOnline",false)){
+                    addButton.setBackgroundColor(getResources().getColor(R.color.Green));
+                    Toast.makeText(getContext(), "Online", Toast.LENGTH_LONG).show();
+                    isOffline = false;
+                }
+                else {
+                    if(!isOffline){
+                        addButton.setBackgroundColor(getResources().getColor(R.color.Red));
+                        Toast.makeText(getContext(), "Offline", Toast.LENGTH_LONG).show();
+                        isOffline = true;
+                    }
+                }
+            }
+            Log.d("debug receiver", intent.getStringExtra("status"));
+        }
     }
 }
 

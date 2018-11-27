@@ -1,7 +1,8 @@
 package com.example.formation12.quizz.ui.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
@@ -10,32 +11,30 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.R;
-import com.example.formation12.quizz.ui.activities.RightActivity;
-import com.example.formation12.quizz.ui.activities.WrongActivity;
+import com.example.formation12.quizz.ui.thread.ProgressTask;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class QuestionActivity extends AppCompatActivity {
-
-    List<Question> questions = new ArrayList<Question>();
+public class QuestionActivity extends AppCompatActivity implements ProgressTask.OnProgressBarListener{
 
     Question questionMoment;
+    double count = 0.0;
 
     Button answer1, answer2, answer3, answer4;
     TextView textQuestion;
-    public static int countQuestionMoment = 0;
     ImageView imageRight, imageWrong;
-
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
+
+        progressBar = findViewById(R.id.progressBar);
 
         questionMoment = getIntent().getParcelableExtra("item");
 
@@ -45,7 +44,6 @@ public class QuestionActivity extends AppCompatActivity {
                 finish();
             }
         });
-
         answer1 = findViewById(R.id.answer1);
         answer2 = findViewById(R.id.answer2);
         answer3 = findViewById(R.id.answer3);
@@ -56,51 +54,18 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Button buttonClicked = (Button)v;
-                if(buttonClicked.getText().toString().equals(questionMoment.bonneReponse)){
-                    //Intent intent = new Intent(QuestionActivity.this, RightActivity.class);
-                    MainActivity.score++;
-                    //startActivity(intent);
-                    imageRight = findViewById(R.id.image_right);
-                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
-                    animScale.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) { }
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            imageRight.setVisibility(View.INVISIBLE);
-                            finish();
-                        }
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                    imageRight.startAnimation(animScale);
-                    imageRight.setVisibility(View.VISIBLE);
+
+                imageRight = findViewById(R.id.image_right);
+                imageWrong = findViewById(R.id.image_wrong);
+
+                if(questionMoment.verifierReponse(buttonClicked.getText().toString())){
+                    animateRWImage(imageRight, 1);
                 }
                 else{
-                    //Intent intent = new Intent(QuestionActivity.this, WrongActivity.class);
-                    //startActivity(intent);
-
-                    imageWrong = findViewById(R.id.image_wrong);
-                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
-                    animScale.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) { }
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            imageWrong.setVisibility(View.INVISIBLE);
-                            finish();
-                        }
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                    imageWrong.startAnimation(animScale);
-                    imageWrong.setVisibility(View.VISIBLE);
-
-
+                    animateRWImage(imageWrong, -1);
                 }
             }
         };
-
         answer1.setOnClickListener(onAnswerclicked);
         answer2.setOnClickListener(onAnswerclicked);
         answer3.setOnClickListener(onAnswerclicked);
@@ -109,9 +74,29 @@ public class QuestionActivity extends AppCompatActivity {
         setQuestion(questionMoment);
         setupWindowAnimations();
         animateAnswer();
-
     }
 
+
+
+    private void animateRWImage(final ImageView img, final int response){
+        final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
+        animScale.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                img.setVisibility(View.INVISIBLE);
+                questionMoment.isGoodAnswer = response;
+                questionMoment.responseTime = count;
+                QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
+                finish();
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        img.startAnimation(animScale);
+        img.setVisibility(View.VISIBLE);
+    }
 
     private void animateAnswer(){
 
@@ -144,6 +129,15 @@ public class QuestionActivity extends AppCompatActivity {
 
         final ObjectAnimator animation8 = ObjectAnimator.ofFloat(answer4, "translationX", 0f);
         animation8.setDuration(3000).start();
+
+        animation8.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                ProgressTask pgt = new ProgressTask(QuestionActivity.this);
+                pgt.execute();
+            }
+        });
     }
 
     private void setupWindowAnimations() {
@@ -151,18 +145,6 @@ public class QuestionActivity extends AppCompatActivity {
         slide.setDuration(1000);
         getWindow().setExitTransition(slide);
     }
-
-    private void initQuestion() {
-
-        Question question1 = new Question("Quel est la capitale de la france ?",4);
-        question1.addPropositions("Paris");
-        question1.addPropositions("Nantes");
-        question1.addPropositions("Berlin");
-        question1.addPropositions("Tokyo");
-        question1.bonneReponse = "Nantes";
-        questions.add(question1);
-    }
-
 
     private void setQuestion(Question question){
 
@@ -173,6 +155,20 @@ public class QuestionActivity extends AppCompatActivity {
         answer4.setText(question.propositions.get(3));
     }
 
+    @Override
+    public void onBegin() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void onProgress(Integer... values) {
+        count = (values[0]*5)/100;
+        progressBar.setProgress(values[0]);
+    }
 
+    @Override
+    public void onFinish(int count) {
+
+        finish();
+    }
 }

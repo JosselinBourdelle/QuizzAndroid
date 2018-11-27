@@ -5,11 +5,22 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.SettingsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/settings"
-        android:textSize="50sp"/>
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/check_save"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="save to database"
+            android:textSize="30sp"/>
+
+    </LinearLayout>
 
 </FrameLayout>
