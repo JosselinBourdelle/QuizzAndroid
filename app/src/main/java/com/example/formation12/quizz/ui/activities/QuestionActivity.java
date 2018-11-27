@@ -17,16 +17,12 @@ import android.widget.TextView;
 import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
 import com.example.formation12.quizz.R;
-import com.example.formation12.quizz.ui.Thread.ProgressTask;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.formation12.quizz.ui.thread.ProgressTask;
 
 public class QuestionActivity extends AppCompatActivity implements ProgressTask.OnProgressBarListener{
 
-    List<Question> questions = new ArrayList<Question>();
-
     Question questionMoment;
+    double count = 0.0;
 
     Button answer1, answer2, answer3, answer4;
     TextView textQuestion;
@@ -48,7 +44,6 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
                 finish();
             }
         });
-
         answer1 = findViewById(R.id.answer1);
         answer2 = findViewById(R.id.answer2);
         answer3 = findViewById(R.id.answer3);
@@ -59,53 +54,18 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
             @Override
             public void onClick(View v) {
                 Button buttonClicked = (Button)v;
-                if(buttonClicked.getText().toString().equals(questionMoment.bonneReponse)){
-                    //Intent intent = new Intent(QuestionActivity.this, RightActivity.class);
-                    MainActivity.score++;
-                    //startActivity(intent);
-                    imageRight = findViewById(R.id.image_right);
-                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
-                    animScale.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) { }
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            imageRight.setVisibility(View.INVISIBLE);
-                            questionMoment.isGoodAnswer = 1;
-                            QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
-                            finish();
-                        }
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                    imageRight.startAnimation(animScale);
-                    imageRight.setVisibility(View.VISIBLE);
+
+                imageRight = findViewById(R.id.image_right);
+                imageWrong = findViewById(R.id.image_wrong);
+
+                if(questionMoment.verifierReponse(buttonClicked.getText().toString())){
+                    animateRWImage(imageRight, 1);
                 }
                 else{
-                    //Intent intent = new Intent(QuestionActivity.this, WrongActivity.class);
-                    //startActivity(intent);
-
-                    imageWrong = findViewById(R.id.image_wrong);
-                    final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
-                    animScale.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) { }
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            imageWrong.setVisibility(View.INVISIBLE);
-                            questionMoment.isGoodAnswer = -1;
-                            QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
-                            finish();
-                        }
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                    imageWrong.startAnimation(animScale);
-                    imageWrong.setVisibility(View.VISIBLE);
+                    animateRWImage(imageWrong, -1);
                 }
             }
         };
-
         answer1.setOnClickListener(onAnswerclicked);
         answer2.setOnClickListener(onAnswerclicked);
         answer3.setOnClickListener(onAnswerclicked);
@@ -116,6 +76,27 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
         animateAnswer();
     }
 
+
+
+    private void animateRWImage(final ImageView img, final int response){
+        final Animation animScale = AnimationUtils.loadAnimation(QuestionActivity.this, R.anim.scale);
+        animScale.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                img.setVisibility(View.INVISIBLE);
+                questionMoment.isGoodAnswer = response;
+                questionMoment.responseTime = count;
+                QuestionDatabaseHelper.getInstance(QuestionActivity.this).updateUserResponse(questionMoment);
+                finish();
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        img.startAnimation(animScale);
+        img.setVisibility(View.VISIBLE);
+    }
 
     private void animateAnswer(){
 
@@ -181,11 +162,13 @@ public class QuestionActivity extends AppCompatActivity implements ProgressTask.
 
     @Override
     public void onProgress(Integer... values) {
+        count = (values[0]*5)/100;
         progressBar.setProgress(values[0]);
     }
 
     @Override
-    public void onFinish() {
+    public void onFinish(int count) {
+
         finish();
     }
 }

@@ -27,7 +27,6 @@ import java.util.List;
 public class AddFragment extends Fragment {
 
     //variables
-
     boolean isOffline = false;
 
     List<CheckBox> checkBoxes = new ArrayList<>();
@@ -39,19 +38,6 @@ public class AddFragment extends Fragment {
 
     public OnCreateListener onCreateListener;
 
-
-    public AddFragment() {
-    }
-
-    public static AddFragment newInstance(String param1, String param2) {
-        AddFragment fragment = new AddFragment();
-       return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,13 +102,13 @@ public class AddFragment extends Fragment {
         for(CheckBox c : checkBoxes){
             c.setChecked(false);
         }
-        if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(0))){
+        if(questionToEditable.verifierReponse(questionToEditable.propositions.get(0))){
             check1.setChecked(true);
-        } else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(1))){
+        } else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(1))){
             check2.setChecked(true);
-        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(2))){
+        }else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(2))){
             check3.setChecked(true);
-        }else if(questionToEditable.bonneReponse.equals(questionToEditable.propositions.get(3))){
+        }else if(questionToEditable.verifierReponse(questionToEditable.propositions.get(3))){
             check4.setChecked(true);
         }
     }

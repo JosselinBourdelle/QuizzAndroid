@@ -1,4 +1,4 @@
-package com.example.formation12.quizz.ui.Thread;
+package com.example.formation12.quizz.ui.thread;
 
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -20,7 +20,7 @@ public class ProgressTask extends AsyncTask<Void, Integer, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        listener.onFinish();
+        listener.onFinish(count);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ProgressTask extends AsyncTask<Void, Integer, String> {
     public interface OnProgressBarListener{
         void onBegin();
         void onProgress(Integer... values);
-        void onFinish();
+        void onFinish(int count);
     }
 
 }

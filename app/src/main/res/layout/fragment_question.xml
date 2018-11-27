@@ -36,7 +36,6 @@
             android:layout_gravity="center"
             android:id="@+id/icon_question"/>
 
-
     </LinearLayout>
 
     <RelativeLayout
@@ -44,6 +43,5 @@
         android:layout_height="1dp"
         android:background="@color/DimGray"
         android:id="@+id/bottom_layout"></RelativeLayout>
-
 
 </LinearLayout>

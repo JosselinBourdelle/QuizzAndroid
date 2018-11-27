@@ -2,7 +2,6 @@ package com.example.formation12.quizz.api;
 
 import android.util.Log;
 
-import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
 
 import org.json.JSONArray;
@@ -24,7 +23,7 @@ import okhttp3.Response;
 public class APIClient {
 
     //private final String baseUrl = "http://192.168.10.38:3000";
-    private final String baseUrl = "http://192.168.10.171:3000";
+    private final String baseUrl = "http://192.168.10.144:3000";
 
     private final String KEY_ID = "id";
     private final String KEY_INTITULE = "title";
@@ -135,6 +134,7 @@ public class APIClient {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseData = response.body().string();
+                Log.d("Debug delete ", "Response !!");
                 try {
                     JSONObject jsonServerObject = new JSONObject(responseData);
                     result.OnSuccess(parseJsonObject(jsonServerObject));
@@ -157,7 +157,6 @@ public class APIClient {
         question.imageAuthorUrl = jsonObject.getString(KEY_IMAGE_AUTHOR);
         question.authorName = jsonObject.getString(KEY_AUTHOR_NAME);
         return question;
-
     }
 
     private JSONObject parseQuestionToJSON(Question q) throws JSONException {
@@ -170,10 +169,9 @@ public class APIClient {
         json.put(KEY_INTITULE, q.intitule);
         json.put(KEY_IMAGE_AUTHOR, AUTHOR_IMAGE);
         json.put(KEY_AUTHOR_NAME, AUTHOR_NAME);
+        json.put(KEY_ID, q.idquestion);
         return json;
     }
-
-
 
     public interface APIResult<T> {
         void onFailure(Exception e);

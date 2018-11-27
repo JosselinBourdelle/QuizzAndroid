@@ -15,8 +15,6 @@ import com.example.formation12.quizz.R;
 import com.example.formation12.quizz.api.APIClient;
 import com.example.formation12.quizz.database.QuestionDatabaseHelper;
 import com.example.formation12.quizz.model.Question;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -58,15 +56,16 @@ public class QuestionListFragment extends Fragment {
             }
 
             @Override
-            public void OnSuccess(List<Question> object)  {
+            public void OnSuccess(final List<Question> object)  {
 
-                final List<Question> dataToReaload = QuestionDatabaseHelper.getInstance(QuestionListFragment.this.getContext()).getAllQuestions();
+                QuestionDatabaseHelper.getInstance(getActivity()).synchroniseDatabaseQuestions(object);
+                final List<Question> results = QuestionDatabaseHelper.getInstance(getActivity()).getAllQuestions();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if( adapter != null) {
-                            adapter.updateQuestionList(dataToReaload);
+                            adapter.updateQuestionList(results);
                         }
                     }
                 });
@@ -77,8 +76,7 @@ public class QuestionListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        List<Question> questions = new ArrayList<>();
-        questions = QuestionDatabaseHelper.getInstance(getContext()).getAllQuestions();
+        List<Question> questions = QuestionDatabaseHelper.getInstance(getContext()).getAllQuestions();
 
         View view = inflater.inflate(R.layout.fragment_question_list, container, false);
         if (view instanceof RecyclerView) {

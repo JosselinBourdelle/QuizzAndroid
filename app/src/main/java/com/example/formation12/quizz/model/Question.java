@@ -15,7 +15,7 @@ public class Question implements Parcelable {
     public String imageAuthorUrl;
     public String authorName;
     public int isGoodAnswer = 0;
-
+    public double responseTime = 0.0;
 
     public Question(String question, int nombreDeReponse) {
 
@@ -33,6 +33,7 @@ public class Question implements Parcelable {
         imageAuthorUrl = in.readString();
         authorName = in.readString();
         isGoodAnswer = in.readInt();
+        responseTime = in.readDouble();
     }
 
     public static final Creator<Question> CREATOR = new Creator<Question>() {
@@ -72,5 +73,6 @@ public class Question implements Parcelable {
         dest.writeString(imageAuthorUrl);
         dest.writeString(authorName);
         dest.writeInt(isGoodAnswer);
+        dest.writeDouble(responseTime);
     }
 }

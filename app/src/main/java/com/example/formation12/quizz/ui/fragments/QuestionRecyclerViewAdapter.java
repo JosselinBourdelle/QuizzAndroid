@@ -113,8 +113,7 @@ public class QuestionRecyclerViewAdapter extends RecyclerView.Adapter<QuestionRe
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            //mIdView = (TextView) view.findViewById(R.id.item_number);
-            mIntitule = (TextView) view.findViewById(R.id.intitule_item);
+            mIntitule = view.findViewById(R.id.intitule_item);
             imageAuthor = view.findViewById(R.id.image_author);
             layoutToBackground = view.findViewById(R.id.bottom_layout);
             iconQuestion = view.findViewById(R.id.icon_question);

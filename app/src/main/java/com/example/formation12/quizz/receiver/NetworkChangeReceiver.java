@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 
 public class NetworkChangeReceiver  extends BroadcastReceiver {
@@ -26,10 +27,12 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
 
     private void sendInternalBroadcast(Context context, String status)
     {
+        Log.e("BRAODCAST REVEIVER ", String.valueOf(isOnline(context)));
         try
         {
             boolean isOnline = isOnline(context);
             Intent intent = new Intent();
+
             intent.putExtra("isOnline", isOnline);
             intent.putExtra("status", status);
             intent.setAction(NETWORK_CHANGE_ACTION);
@@ -48,7 +51,6 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
         {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            //should check null because in airplane mode it will be null
             isOnline = (netInfo != null && netInfo.isConnected());
         }
         catch (Exception ex)

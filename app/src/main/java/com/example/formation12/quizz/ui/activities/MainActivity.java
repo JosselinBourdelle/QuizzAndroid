@@ -28,34 +28,33 @@ public class MainActivity extends AppCompatActivity
         QuestionListFragment.OnListFragmentInteractionListener,
         AddFragment.OnCreateListener{
 
-    public static int score = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new QuestionListFragment()).commit();
         }
-
-
     }
+
+
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -98,10 +97,8 @@ public class MainActivity extends AppCompatActivity
             Fragment frag = new AddFragment();
             ((AddFragment) frag).onCreateListener = this;
             getSupportFragmentManager().beginTransaction().replace(R.id.content_main, frag).commit();
-        } else if (id == R.id.nav_delete) {
-
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -123,8 +120,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void deleteQuestion(Question q) {
-        QuestionDatabaseHelper.getInstance(this).deleteQuestion(q);
+    public void deleteQuestion(final Question q) {
+        APIClient.getInstance().deleteQuestion(new APIClient.APIResult<Question>() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d("Debug delete main : ", "FAIL !!!!!");
+            }
+
+            @Override
+            public void OnSuccess(Question object) {
+                QuestionDatabaseHelper.getInstance(MainActivity.this).deleteQuestion(object);
+            }
+        }, q);
     }
 
     @Override
@@ -134,16 +141,15 @@ public class MainActivity extends AppCompatActivity
         APIClient.getInstance().createQuestion(new APIClient.APIResult<Question>() {
             @Override
             public void onFailure(Exception e) {
-                Log.e("Debug : ", "FAIL !!!");
+                Log.e("Debug create main : ", "FAIL !!!");
             }
 
             @Override
             public void OnSuccess(Question object) {
-                QuestionDatabaseHelper.getInstance(MainActivity.this).addQuestion(q);
+                QuestionDatabaseHelper.getInstance(MainActivity.this).addQuestion(object);
             }
         }, q);
     }
-
 
 
 }
